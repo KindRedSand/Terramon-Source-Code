@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Terramon.Items.Pokeballs.Inventory;
+using Terramon.Pokemon;
 using Terraria.ModLoader.IO;
 
 namespace Terramon.Players
@@ -61,6 +62,31 @@ namespace Terramon.Players
 
             foreach (KeyValuePair<string, object> kvp in tag.GetCompound(nameof(ThrownPokeballs)))
                 ThrownPokeballs.Add(kvp.Key, int.Parse(kvp.Value.ToString()));
+        }
+
+        private void FormatSlots()
+        {
+            PokemonData[] format = new PokemonData[6];
+            int formatCounter = 0;
+            format[0] = PartySlot1;
+            format[1] = PartySlot2;
+            format[2] = PartySlot3;
+            format[3] = PartySlot4;
+            format[4] = PartySlot5;
+            format[5] = PartySlot6;
+            foreach (PokemonData sl in format)
+            {
+                formatCounter++;
+                if (sl != null)
+                {
+                    if (formatCounter == 1) PartySlot1 = sl;
+                    if (formatCounter == 2) PartySlot2 = sl;
+                    if (formatCounter == 3) PartySlot3 = sl;
+                    if (formatCounter == 4) PartySlot4 = sl;
+                    if (formatCounter == 5) PartySlot5 = sl;
+                    if (formatCounter == 6) PartySlot6 = sl;
+                }
+            }
         }
 
 

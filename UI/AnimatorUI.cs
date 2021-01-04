@@ -185,6 +185,18 @@ namespace Terramon.UI
             get => BattleMode.UI.HP2.displayHpNumberLerp;
             set => BattleMode.UI.HP2.displayHpNumberLerp = value;
         }
+
+        public float HPBar1LeftPixels
+        {
+            get => BattleMode.UI.HP1.Left.Pixels;
+            set => BattleMode.UI.HP1.Left.Pixels = value;
+        }
+
+        public float WhiteFlashOpacityVal
+        {
+            get => BattleMode.UI.FLASH_VISIBILITY;
+            set => BattleMode.UI.FLASH_VISIBILITY = value;
+        }
     }
     public static class AnimatorExtensions
     {
@@ -237,5 +249,17 @@ namespace Terramon.UI
         public static TransformSequence<T> HPBar2DisplayNumber<T>(this TransformSequence<T> t, int newValue, double duration = 0, Easing easing = Easing.None)
                   where T : Animator =>
                   t.Append(o => o.HPBar2DisplayNumber(newValue, duration, easing));
+
+        public static TransformSequence<T> HPBar1LeftPixels<T>(this T drawable, float newValue, double duration = 0, Easing easing = Easing.None) where T : Animator =>
+            drawable.TransformTo(nameof(drawable.HPBar1LeftPixels), newValue, duration, easing);
+        public static TransformSequence<T> HPBar1LeftPixels<T>(this TransformSequence<T> t, float newValue, double duration = 0, Easing easing = Easing.None)
+                  where T : Animator =>
+                  t.Append(o => o.HPBar1LeftPixels(newValue, duration, easing));
+
+        public static TransformSequence<T> WhiteFlashOpacity<T>(this T drawable, float newValue, double duration = 0, Easing easing = Easing.None) where T : Animator =>
+            drawable.TransformTo(nameof(drawable.WhiteFlashOpacityVal), newValue, duration, easing);
+        public static TransformSequence<T> WhiteFlashOpacity<T>(this TransformSequence<T> t, float newValue, double duration = 0, Easing easing = Easing.None)
+                  where T : Animator =>
+                  t.Append(o => o.WhiteFlashOpacity(newValue, duration, easing));
     }
 }

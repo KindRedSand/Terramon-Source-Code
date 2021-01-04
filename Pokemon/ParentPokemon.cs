@@ -13,6 +13,8 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Terraria.UI.Chat;
 using Razorwing.Framework.Localisation;
+using Terraria.Graphics.Effects;
+using Terraria.Graphics.Shaders;
 // ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable PossibleLossOfFraction
 
@@ -67,7 +69,7 @@ namespace Terramon.Pokemon
 
         private string iconName;
 
-        public int SpawnTime = 0;
+        public int SpawnTime = 32;
         public virtual string IconName => iconName ?? (iconName = $"Terramon/Minisprites/Regular/mini{GetType().Name}");
 	    private readonly string nameMatcher = "([a-z](?=[A-Z]|[0-9])|[A-Z](?=[A-Z][a-z]|[0-9])|[0-9](?=[^0-9]))";
 
@@ -78,6 +80,14 @@ namespace Terramon.Pokemon
         public int frame;
         public int frameCounter;
 
+        private bool playedDropSfx = false;
+
+        public bool drawMain = false; // Whether or not to draw the Pokemon texture at all, starts as false
+        public float whiteFlashVal = 1f;
+        public float dootscale = 0.1f;
+        public bool DontTpOnCollide = false;
+
+        public int throwBallAnimProjectile;
 
         public override void SetStaticDefaults()
         {
@@ -93,6 +103,7 @@ namespace Terramon.Pokemon
             projectile.friendly = true;
             projectile.penetrate = -1;
             projectile.timeLeft *= 5;
+            projectile.alpha = 255; // Start as transparent
             projectile.owner = Main.myPlayer;
             drawOffsetX = 0;
             if (Main.dedServ)
@@ -122,13 +133,27 @@ namespace Terramon.Pokemon
                 path += "_Shiny";
             }
 
-            float scale = projectile.scale;
+            float scale = dootscale;
 
             if (damageReceived)
             {
                 if (flashFrame)
                 {
                     scale = 0f;
+                }
+            }
+
+            // Shaders
+
+            if (Main.netMode != NetmodeID.Server)
+            {
+                spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.ZoomMatrix);
+
+                if (whiteFlashVal == 1f)
+                {
+                    GameShaders.Misc["WhiteTint"].UseOpacity(whiteFlashVal);
+                    GameShaders.Misc["WhiteTint"].Apply();
                 }
             }
 
@@ -177,10 +202,16 @@ namespace Terramon.Pokemon
                 }
             }
             if (highlighted && Main.LocalPlayer.GetModPlayer<TerramonPlayer>().Battle == null && HoldingUsableItem()) drawColor = Color.White;
-            spriteBatch.Draw(pkmnTexture, projectile.position - Main.screenPosition + new Vector2(14, 0),
+            if (drawMain) spriteBatch.Draw(pkmnTexture, projectile.position - Main.screenPosition + new Vector2(14, 0),
                 new Rectangle(0, frameHeight * frame, pkmnTexture.Width, frameHeight), drawColor, projectile.rotation,
                 new Vector2(pkmnTexture.Width / 2f, frameHeight / 2), scale, effects, 0f);
             return true;
+        }
+
+        public override void PostDraw(SpriteBatch spriteBatch, Color lightColor)
+        {
+            spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.ZoomMatrix);
         }
 
         public override bool PreAI()
@@ -195,7 +226,7 @@ namespace Terramon.Pokemon
         private int mainAi = ProjectileID.Puppy;
 
         // for wild, walking pokemon
-        public int hopTimer;
+        public int hopTimer = -150;
         private bool jumping = false;
         private bool flashFrame;
 
@@ -263,7 +294,7 @@ namespace Terramon.Pokemon
 
             if (!highlighted) justHighlighted = false;
 
-            if (!Wild && !flying) PuppyAI();
+            if (!Wild && !flying && SpawnTime >= 0) PuppyAI();
 
             Player player = Main.player[projectile.owner];
             TerramonPlayer modPlayer = player.GetModPlayer<TerramonPlayer>();
@@ -281,7 +312,7 @@ namespace Terramon.Pokemon
 
             if (!Wild)
             {
-                projectile.spriteDirection = projectile.velocity.X > 0 ? -1 : (projectile.velocity.X < 0 ? 1 : projectile.spriteDirection);
+                if (projectile.velocity.X != 0) projectile.spriteDirection = projectile.velocity.X > 0 ? -1 : (projectile.velocity.X < 0 ? 1 : projectile.spriteDirection);
 
                 if (highlighted && Main.mouseRight)
                 {
@@ -317,6 +348,8 @@ namespace Terramon.Pokemon
 
             if (Wild)
             {
+                dootscale = 1f;
+                whiteFlashVal = 0f;
                 frameCounter++;
                 if (frameCounter > 15)
                 {
@@ -330,16 +363,24 @@ namespace Terramon.Pokemon
             }
 
             SpawnTime++;
-            if (SpawnTime == 1 && player.active)
+            if (SpawnTime < 33 && !Wild)
             {
-                if (player.direction == -1) // direction right
-                {
-                    projectile.direction = -1;
-                }
+                drawMain = false;
+            }
+            else drawMain = true;
+
+            if (SpawnTime > 33 && !Wild)
+            {
+                if (dootscale < 1f) dootscale += 0.045f;
                 else
                 {
-                    projectile.direction = 1;
+                    dootscale = 1f;
+                    whiteFlashVal = 0f;
                 }
+            }
+
+            if (SpawnTime == 33 && player.active)
+            {
 
                 string n = Regex.Replace(projectile.Name, nameMatcher, "$1 ");
 
@@ -347,14 +388,28 @@ namespace Terramon.Pokemon
                 if (n == "Nidoran ♀") n = "Nidoranf";
                 if (n == "Mr. Mime") n = "Mrmime";
 
-                if (!Main.dedServ)
+                if (!Main.dedServ && !Wild)
+                {
+                    Main.PlaySound(ModContent.GetInstance<TerramonMod>()
+                        .GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/exitball").WithVolume(0.4f));
                     Main.PlaySound(ModContent.GetInstance<TerramonMod>()
                         .GetLegacySoundSlot(SoundType.Custom, "Sounds/Cries/cry" + n).WithVolume(0.55f));
+                }
 
-                for (int i = 0; i < 18; i++)
+                if (!Wild)
                 {
-                    Dust.NewDust(projectile.position, projectile.width, projectile.height,
-                        mod.DustType("SmokeTransformDust"));
+                    for (int i = 0; i < 16; i++)
+                    {
+                        Dust e = Dust.NewDustDirect(projectile.position, projectile.width, projectile.height,
+                            87, 0, 0, 0, default(Color), 1.2f);
+                        e.noGravity = true;
+                        e = Dust.NewDustDirect(projectile.position, projectile.width, projectile.height,
+                            87, 0, 0, 0, default(Color), 1.2f);
+                        e.noGravity = true;
+                        e = Dust.NewDustDirect(projectile.position, projectile.width, projectile.height,
+                            87, 0, 0, 0, default(Color), 1.2f);
+                        e.noGravity = true;
+                    }
                 }
             }
 
@@ -575,9 +630,14 @@ namespace Terramon.Pokemon
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             Player player = Main.player[projectile.owner];
-            if (SpawnTime <= 6)
+            if (SpawnTime <= 6 && !DontTpOnCollide)
             {
                 projectile.position = player.position;
+            }
+
+            if (!playedDropSfx && !Wild && Main.LocalPlayer.GetModPlayer<TerramonPlayer>().Battle != null)
+            {
+                playedDropSfx = true;
             }
 
             return true;

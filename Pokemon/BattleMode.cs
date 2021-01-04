@@ -23,10 +23,12 @@ using Terramon.UI.Moveset;
 using Terramon.UI.SidebarParty;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
+using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.UI;
+using System.Reflection;
 
 namespace Terramon.Pokemon
 {
@@ -44,12 +46,17 @@ namespace Terramon.Pokemon
         public int wildID;
         public bool awaitSync = false;
         protected BaseMove pMove, oMove;
+        public int ForceDirection = 0; // Use to force player direction
         public bool MoveDone => pMove != null;
         //protected int atackTimeout;
         protected byte animInProggress; // 0 idle, 1 casting, 2 done
 
         public bool battleJustStarted = false;
+
+        public static bool doneWildIntroAppear = false;
         public static bool doneWildIntro = false;
+
+        public bool playMainLoop = false;
 
         protected ILocalisedBindableString playerChallenge =
             TerramonMod.Localisation.GetLocalisedString(new LocalisedString(("playerChallenge", "{0} is challenging you!")));
@@ -186,6 +193,7 @@ namespace Terramon.Pokemon
         public static int animWindow = 0;
         public static bool moveEnd = false;
         private byte animMode = 0;//0 Idle, 1 playerMonAnim, 2 enemyMonAnim, 3 enemyMonContinue, 4 playerMonContinue
+        public int introMusicTimer = 0;
         private int wildTimer = 0;
         public static int endMoveTimer;
 
@@ -199,6 +207,67 @@ namespace Terramon.Pokemon
 
             // increment wild timer
             wildTimer++;
+            if (!playMainLoop) introMusicTimer++;
+
+            if (introMusicTimer > 13.832 * 60) // finished intro music
+            {
+                playMainLoop = true;
+                introMusicTimer = 0;
+            }
+
+            if (introMusicTimer == 1)
+            {
+                TerramonMod.ZoomAnimator.WhiteFlashOpacity(1f, 130, Easing.None);
+            }
+
+            if (introMusicTimer == 10)
+            {
+                TerramonMod.ZoomAnimator.WhiteFlashOpacity(0f, 110, Easing.None);
+            }
+
+            if (introMusicTimer == 18)
+            {
+                TerramonMod.ZoomAnimator.WhiteFlashOpacity(1f, 130, Easing.None);
+            }
+
+            if (introMusicTimer == 28)
+            {
+                TerramonMod.ZoomAnimator.WhiteFlashOpacity(0f, 110, Easing.None);
+            }
+
+            if (introMusicTimer == 38)
+            {
+                TerramonMod.ZoomAnimator.GameZoom(5f, 1500, Easing.None);
+            }
+
+            if (introMusicTimer == 44)
+            {
+                TerramonMod.ZoomAnimator.WhiteFlashOpacity(1f, 1200, Easing.None);
+            }
+
+            if (introMusicTimer == 165)
+            {
+                ParentPokemon playerpet = (ParentPokemon)Main.projectile[player1.ActivePetId].modProjectile;
+                playerpet.SpawnTime = -252;
+                playerpet.DontTpOnCollide = true;
+                UI.HP2.Left.Set(160, 0f);
+            }
+
+            if (introMusicTimer == 170)
+            {
+                // Zoom in
+                TerramonMod.ZoomAnimator.GameZoom(1f).GameZoom(1.7f, 0, Easing.None);
+                // Pan camera to wild opponent, if this is BattleWithWild
+                if (State == BattleState.BattleWithWild)
+                {
+                    TerramonMod.ZoomAnimator.ScreenPosX(WildNPC.projectile.position.X + 12, 0, Easing.None);
+                    TerramonMod.ZoomAnimator.ScreenPosY(WildNPC.projectile.position.Y, 0, Easing.None);
+                }
+                TerramonMod.ZoomAnimator.WhiteFlashOpacity(0f, 200, Easing.None);
+            }
+
+            // force music fade to null
+            Main.musicFade[ModContent.GetInstance<TerramonMod>().GetSoundSlot(SoundType.Music, "Sounds/Music/Battling/wildbattle")] = 1f;
 
             // make player1 pokemon face wildnpc projectile
             if (State == BattleState.BattleWithWild)
@@ -264,29 +333,51 @@ namespace Terramon.Pokemon
                 //if (UI.tipText.Text == "Use UP and DOWN arrows to zoom in/out.") UI.tipText.SetText("");
                 TerramonMod.ZoomAnimator.GameZoom(Main.GameZoomTarget - 0.03f, 1, Easing.None);
             }
-            // END CAMERA & ZOOm CONTROL //
+            // END CAMERA & ZOOM CONTROL //
 
 
 
-            if (battleJustStarted)
+            if (battleJustStarted && introMusicTimer > 190)
             {
-                // Zoom in
-                TerramonMod.ZoomAnimator.GameZoom(1f).GameZoom(1.7f, 500, Easing.Out);
-                // Pan camera to wild opponent, if this is BattleWithWild
-                if (State == BattleState.BattleWithWild)
-                {
-                    TerramonMod.ZoomAnimator.ScreenPosX(WildNPC.projectile.position.X + 12, 500, Easing.Out);
-                    TerramonMod.ZoomAnimator.ScreenPosY(WildNPC.projectile.position.Y, 500, Easing.Out);
-                }
+                Main.PlaySound(ModContent.GetInstance<TerramonMod>()
+                        .GetLegacySoundSlot(SoundType.Custom, "Sounds/Cries/cry" + Wild.Pokemon).WithVolume(0.55f));
+                
                 // Set splash text
                 UI.splashText.SetText($"A wild {Wild.PokemonName} appeared!");
 
                 battleJustStarted = false;
             }
 
-            if (wildTimer >= 180 && !doneWildIntro)
+            if (wildTimer == 370 && !doneWildIntroAppear)
+            {
+                TerramonMod.ZoomAnimator.ScreenPosX(player1.player.position.X + 10, 500, Easing.OutExpo);
+                TerramonMod.ZoomAnimator.ScreenPosY(player1.player.position.Y, 500, Easing.OutExpo);
+
+                // Set splash text
+                UI.splashText.SetText($"Go! {player1.ActivePet.PokemonName}!");
+
+                ForceDirection = Main.projectile[player1.ActivePetId].modProjectile.projectile.position.X > player1.player.position.X ? 1 : -1;
+
+                doneWildIntroAppear = true;
+            }
+
+            if (wildTimer == 470 && !doneWildIntro)
+            {
+                TerramonMod.ZoomAnimator.HPBar1LeftPixels(-340, 500, Easing.OutExpo);
+            }
+
+            if (wildTimer == 430 && !doneWildIntro)
+            {
+                ParentPokemon playerpet = (ParentPokemon)Main.projectile[player1.ActivePetId].modProjectile;
+                playerpet.dootscale = 0.1f;
+                playerpet.whiteFlashVal = 1f;
+                playerpet.DontTpOnCollide = false;
+            }
+
+            if (wildTimer >= 515 && !doneWildIntro)
             {
                 doneWildIntro = true;
+                ForceDirection = 0;
             }
 
             // Make wild pokemon jump every so often
@@ -681,6 +772,7 @@ namespace Terramon.Pokemon
             TerramonMod.ZoomAnimator.GameZoom(1f, 500, Easing.Out);
 
             // end battle, reset static variables
+            doneWildIntroAppear = false;
             doneWildIntro = false;
             wildTimer = 0;
             BattleUI.doneWildIntro = false;
@@ -689,7 +781,10 @@ namespace Terramon.Pokemon
             UI.MovesPanel.Top.Set(500, 1f);
             UI.HP1.firstLoadHP = true;
             UI.HP2.firstLoadHP = true;
+            UI.HP1.Left.Set(20, 1f);
+            UI.HP2.Left.Set(30000, 0f);
             UI.HP1.HPBar.lowHPSoundInstance?.Stop();
+            UI.Append(UI.whiteFlash);
 
             ModContent.GetInstance<TerramonMod>().battleCamera = Vector2.Zero;
 
@@ -882,6 +977,7 @@ namespace Terramon.Pokemon
 
     public class BattleUI : UIState
     {
+        public UIImagez whiteFlash;
         public UITypewriterText splashText;
         public UIText tipText;
         public ButtonMenuPanel ButtonMenuPanel;
@@ -893,6 +989,9 @@ namespace Terramon.Pokemon
 
         public static bool doneWildIntro = false;
 
+        public Color FLASH_COLOR = Color.White;
+        public float FLASH_VISIBILITY = 0f;
+
         public override void OnInitialize()
         {
             // Splash text to replace Main.NewText() calls
@@ -901,6 +1000,12 @@ namespace Terramon.Pokemon
             splashText.Top.Set(-246, 1f);
             Append(splashText);
 
+            whiteFlash = new UIImagez(ModContent.GetTexture("Terramon/UI/IntroMovie/WhiteFlash"));
+            whiteFlash.HAlign = 0f;
+            whiteFlash.VAlign = 0f;
+            whiteFlash.ImageScale *= 5;
+            whiteFlash._visibilityActive = 0f;
+
             tipText = new UIText("", 1.25f);
             tipText.TextColor = new Color(189, 189, 189);
             tipText.VAlign = 0.25f;
@@ -908,14 +1013,16 @@ namespace Terramon.Pokemon
             Append(tipText);
 
             HP1 = new HPPanel(true);
-            HP1.Left.Set(-340, 1f);
+            HP1.Left.Set(20, 1f); //HP1.Left.Set(-340, 1f); 
             HP1.Top.Set(0, 0.6f);
             Append(HP1);
 
             HP2 = new HPPanel(false);
-            HP2.Left.Set(160, 0f);
+            HP2.Left.Set(30000, 0f); //HP2.Left.Set(160, 0f);
             HP2.Top.Set(0, 0.4f);
             Append(HP2);
+
+            Append(whiteFlash);
 
             MovesPanel = new MovesPanel()
             {
@@ -948,6 +1055,8 @@ namespace Terramon.Pokemon
         }
         public override void Update(GameTime gameTime)
         {
+            whiteFlash._visibilityActive = FLASH_VISIBILITY;
+
             if (BattleMode.doneWildIntro && !doneWildIntro)
             {
                 var player1 = Main.LocalPlayer.GetModPlayer<TerramonPlayer>();
@@ -958,11 +1067,13 @@ namespace Terramon.Pokemon
                     player1.firstBattle = false;
                 }
 
+                whiteFlash.Remove();
+
                 splashText.SetText($"What will {player1.ActivePet.PokemonName} do?");
 
                 // pan camera to local player pokemon
                 Main.PlaySound(ModContent.GetInstance<TerramonMod>().GetLegacySoundSlot(SoundType.Custom, "Sounds/UI/uislide").WithVolume(.6f));
-                TerramonMod.ZoomAnimator.ScreenPosX(Main.projectile[player1.ActivePetId].modProjectile.projectile.position.X + 12, 500, Easing.OutExpo);
+                TerramonMod.ZoomAnimator.ScreenPosX(Main.projectile[player1.ActivePetId].modProjectile.projectile.position.X, 500, Easing.OutExpo);
                 TerramonMod.ZoomAnimator.ScreenPosY(Main.projectile[player1.ActivePetId].modProjectile.projectile.position.Y, 500, Easing.OutExpo);
 
                 ButtonMenuPanel = new ButtonMenuPanel();

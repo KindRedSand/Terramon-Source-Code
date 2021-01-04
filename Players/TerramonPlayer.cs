@@ -1031,6 +1031,9 @@ namespace Terramon.Players
             else
                 PartySlot6 = null;
 
+            // Fix spaces in slots
+            FormatSlots();
+
             LoadPokeballs(tag);
 
             if (tag.ContainsKey(nameof(PokemonStore)))
@@ -1124,6 +1127,13 @@ namespace Terramon.Players
         {
             if (Battle != null)
             {
+                if (Battle.ForceDirection != 0)
+                {
+                    player.direction = Battle.ForceDirection;
+                } else
+                {
+                    player.direction = Battle.WildNPC.projectile.position.X > player.position.X ? 1 : -1;
+                }
                 player.velocity.X = 0;
                 if (player.mount.Active)
                 {

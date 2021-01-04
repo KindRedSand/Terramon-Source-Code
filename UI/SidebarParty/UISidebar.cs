@@ -603,13 +603,18 @@ namespace Terramon.UI.SidebarParty
                 if (!player.HasBuff(pokeBuff)) player.AddBuff(pokeBuff, 2);
                 modPlayer.ActivePetName = pet;
                 goText.Args = new object[] {pokemonName1.Value};
-                CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
+                //CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
                 Main.PlaySound(ModContent.GetInstance<TerramonMod>()
                     .GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/sendout"));
                 modPlayer.ActivePartySlot = 1; //This automatically sync active pet
             }
             else
             {
+                for (int i = 0; i < 18; i++)
+                {
+                    Dust.NewDust(Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.position, Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.width, Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.height,
+                        ModContent.GetInstance<TerramonMod>().DustType("SmokeTransformDust"));
+                }
                 player.ClearBuff(pokeBuff);
                 PrintSwitch(player, modPlayer);
                 modPlayer.ActivePetName = string.Empty;
@@ -636,13 +641,18 @@ namespace Terramon.UI.SidebarParty
                 if (!player.HasBuff(pokeBuff)) player.AddBuff(pokeBuff, 2);
                 modPlayer.ActivePetName = pet;
                 goText.Args = new object[] {pokemonName2.Value};
-                CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
+                //CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
                 Main.PlaySound(ModContent.GetInstance<TerramonMod>()
                     .GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/sendout"));
                 modPlayer.ActivePartySlot = 2;
             }
             else
             {
+                for (int i = 0; i < 18; i++)
+                {
+                    Dust.NewDust(Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.position, Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.width, Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.height,
+                        ModContent.GetInstance<TerramonMod>().DustType("SmokeTransformDust"));
+                }
                 player.ClearBuff(pokeBuff);
                 PrintSwitch(player, modPlayer);
                 modPlayer.ActivePetName = string.Empty;
@@ -669,13 +679,18 @@ namespace Terramon.UI.SidebarParty
                 if (!player.HasBuff(pokeBuff)) player.AddBuff(pokeBuff, 2);
                 modPlayer.ActivePetName = pet;
                 goText.Args = new object[] {pokemonName3.Value};
-                CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
+                //CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
                 Main.PlaySound(ModContent.GetInstance<TerramonMod>()
                     .GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/sendout"));
                 modPlayer.ActivePartySlot = 3;
             }
             else
             {
+                for (int i = 0; i < 18; i++)
+                {
+                    Dust.NewDust(Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.position, Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.width, Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.height,
+                        ModContent.GetInstance<TerramonMod>().DustType("SmokeTransformDust"));
+                }
                 player.ClearBuff(pokeBuff);
                 PrintSwitch(player, modPlayer);
                 modPlayer.ActivePetName = string.Empty;
@@ -702,13 +717,18 @@ namespace Terramon.UI.SidebarParty
                 if (!player.HasBuff(pokeBuff)) player.AddBuff(pokeBuff, 2);
                 modPlayer.ActivePetName = pet;
                 goText.Args = new object[] {pokemonName4.Value};
-                CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
+                //CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
                 Main.PlaySound(ModContent.GetInstance<TerramonMod>()
                     .GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/sendout"));
                 modPlayer.ActivePartySlot = 4;
             }
             else
             {
+                for (int i = 0; i < 18; i++)
+                {
+                    Dust.NewDust(Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.position, Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.width, Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.height,
+                        ModContent.GetInstance<TerramonMod>().DustType("SmokeTransformDust"));
+                }
                 player.ClearBuff(pokeBuff);
                 PrintSwitch(player, modPlayer);
                 modPlayer.ActivePetName = string.Empty;
@@ -735,13 +755,18 @@ namespace Terramon.UI.SidebarParty
                 if (!player.HasBuff(pokeBuff)) player.AddBuff(pokeBuff, 2);
                 modPlayer.ActivePetName = pet;
                 goText.Args = new object[] {pokemonName5.Value};
-                CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
+                //CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
                 Main.PlaySound(ModContent.GetInstance<TerramonMod>()
                     .GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/sendout"));
                 modPlayer.ActivePartySlot = 5;
             }
             else
             {
+                for (int i = 0; i < 18; i++)
+                {
+                    Dust.NewDust(Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.position, Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.width, Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.height,
+                        ModContent.GetInstance<TerramonMod>().DustType("SmokeTransformDust"));
+                }
                 player.ClearBuff(pokeBuff);
                 PrintSwitch(player, modPlayer);
                 modPlayer.ActivePetName = string.Empty;
@@ -768,13 +793,18 @@ namespace Terramon.UI.SidebarParty
                 if (!player.HasBuff(pokeBuff)) player.AddBuff(pokeBuff, 2);
                 modPlayer.ActivePetName = pet;
                 goText.Args = new object[] {pokemonName6.Value};
-                CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
+                //CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
                 Main.PlaySound(ModContent.GetInstance<TerramonMod>()
                     .GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/sendout"));
                 modPlayer.ActivePartySlot = 6;
             }
             else
             {
+                for (int i = 0; i < 18; i++)
+                {
+                    Dust.NewDust(Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.position, Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.width, Main.projectile[modPlayer.ActivePetId].modProjectile.projectile.height,
+                        ModContent.GetInstance<TerramonMod>().DustType("SmokeTransformDust"));
+                }
                 player.ClearBuff(pokeBuff);
                 PrintSwitch(player, modPlayer);
                 modPlayer.ActivePetName = string.Empty;
@@ -813,15 +843,15 @@ namespace Terramon.UI.SidebarParty
             {
                 case 0:
                     retire1Text.Args = new object[] {pet};
-                    CombatText.NewText(rect, Color.White, retire1Text.Value, true);
+                    //CombatText.NewText(rect, Color.White, retire1Text.Value, true);
                     break;
                 case 1:
                     retire2Text.Args = new object[] {pet};
-                    CombatText.NewText(rect, Color.White, retire2Text.Value, true);
+                    //CombatText.NewText(rect, Color.White, retire2Text.Value, true);
                     break;
                 default:
                     retire3Text.Args = new object[] {pet};
-                    CombatText.NewText(rect, Color.White, retire3Text.Value, true);
+                    //CombatText.NewText(rect, Color.White, retire3Text.Value, true);
                     break;
             }
         }

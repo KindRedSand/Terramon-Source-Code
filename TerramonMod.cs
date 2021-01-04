@@ -26,18 +26,17 @@ using Terramon.UI;
 using Terramon.UI.Moveset;
 using Terramon.UI.SidebarParty;
 using Terramon.UI.Starter;
-using Terramon.Pokemon.Moves;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.UI;
-using Terramon.Sounds.Custom;
 using Terramon.Players;
 using Terramon.UI.Test;
 using Terraria.Utilities;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
+using Terraria.Graphics;
 
 namespace Terramon
 {
@@ -307,8 +306,10 @@ namespace Terramon
                 //Main.versionNumber = ss.Value + "\n" + Main.versionNumber;
 #endif
                 Ref<Effect> screenRef = new Ref<Effect>(GetEffect("Effects/ShockwaveEffect")); // The path to the compiled shader file.
+                Ref<Effect> whiteShaderRef = new Ref<Effect>(GetEffect("Effects/whiteshader")); // The path to the compiled shader file.
                 Filters.Scene["Shockwave"] = new Filter(new ScreenShaderData(screenRef, "Shockwave"), EffectPriority.VeryHigh);
                 Filters.Scene["Shockwave"].Load();
+                GameShaders.Misc["WhiteTint"] = new MiscShaderData(whiteShaderRef, "ArmorBasic");
 
                 ChooseStarter = new ChooseStarter();
                 ChooseStarter.Activate();
@@ -524,6 +525,11 @@ namespace Terramon
         public static bool MyUIStateActive(Player player)
         {
             return ChooseStarter.Visible;
+        }
+
+        public override void ModifyTransformMatrix(ref SpriteViewMatrix Transform)
+        {
+            Transform.Zoom = new Vector2(Main.GameZoomTarget);
         }
 
         public override void UpdateMusic(ref int music, ref MusicPriority priority)

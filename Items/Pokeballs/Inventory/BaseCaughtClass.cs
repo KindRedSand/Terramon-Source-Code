@@ -174,7 +174,7 @@ namespace Terramon.Items.Pokeballs.Inventory
                 modPlayer.ActivePetName = PokemonName;
                 modPlayer.ActivatePet(PokemonName, false);
                 goText.Args = new object[] { pokeName.Value };
-                CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
+                //CombatText.NewText(player.Hitbox, Color.White, goText.Value, true);
                 Main.PlaySound(ModContent.GetInstance<TerramonMod>().GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/sendout").WithVolume(0.34f));
             }
             else
@@ -185,15 +185,15 @@ namespace Terramon.Items.Pokeballs.Inventory
                 {
                     case 0:
                         retire1Text.Args = new object[] { pokeName.Value };
-                        CombatText.NewText(player.Hitbox, Color.White, retire1Text.Value, true);
+                        //CombatText.NewText(player.Hitbox, Color.White, retire1Text.Value, true);
                         break;
                     case 1:
                         retire2Text.Args = new object[] { pokeName.Value };
-                        CombatText.NewText(player.Hitbox, Color.White, retire2Text.Value, true);
+                        //CombatText.NewText(player.Hitbox, Color.White, retire2Text.Value, true);
                         break;
                     default:
                         retire3Text.Args = new object[] { pokeName.Value };
-                        CombatText.NewText(player.Hitbox, Color.White, retire3Text.Value, true);
+                        //CombatText.NewText(player.Hitbox, Color.White, retire3Text.Value, true);
                         break;
                 }
 

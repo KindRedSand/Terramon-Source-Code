@@ -58,13 +58,14 @@ namespace Terramon
             {
                 if (player.direction == 1) // direction right
                 {
-                    modPlayer.ActivePetId = Projectile.NewProjectile(player.position.X + 50,
+                    modPlayer.ActivePetId = Projectile.NewProjectile(player.position.X + 54,
                     player.position.Y - 8, 0f, 0f, mod.ProjectileType(ProjectileName), 0, 0f,
                     player.whoAmI, 0f, 0f);
+                    Main.projectile[modPlayer.ActivePetId].spriteDirection = 1;
                 }
                 else // direction left
                 {
-                    modPlayer.ActivePetId = Projectile.NewProjectile(player.position.X - 50,
+                    modPlayer.ActivePetId = Projectile.NewProjectile(player.position.X - 32,
                     player.position.Y - 8, 0f, 0f, mod.ProjectileType(ProjectileName), 0, 0f,
                     player.whoAmI, 0f, 0f);
                 }
