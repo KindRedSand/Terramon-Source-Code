@@ -535,7 +535,7 @@ namespace Terramon
             if (player.Battle != null)
             {
                 priority = MusicPriority.BossHigh;
-                music = GetSoundSlot(SoundType.Music, "Sounds/Music/Battling/wildbattle");
+                music = GetSoundSlot(SoundType.Music, "Sounds/Music/Battling/wild");
                 return;
             }
 
