@@ -164,7 +164,7 @@ namespace Terramon.Pokemon
                         UI.MovesPanel.PokeData = new PokemonData()
                         {
                             Pokemon = npc.HomeClass().Name,
-                            Moves = new BaseMove[] { new QuickAttack(), new Acid(), new Cut(), new Earthquake() }
+                            Moves = new BaseMove[] { new QuickAttack(), new Acid(), new Agility(), new Earthquake() }
                         };
                         wildChallenge.Args = new object[] { second?.Pokemon };
                         //Text(wildChallenge.Value);
@@ -791,6 +791,7 @@ namespace Terramon.Pokemon
             // reset modifiers
             if (player1.ActivePet.CustomData.ContainsKey("PhysDefModifier")) player1.ActivePet.CustomData.Remove("PhysDefModifier");
             if (player1.ActivePet.CustomData.ContainsKey("SpDefModifier")) player1.ActivePet.CustomData.Remove("SpDefModifier");
+            if (player1.ActivePet.CustomData.ContainsKey("SpeedModifier")) player1.ActivePet.CustomData.Remove("SpeedModifier");
             if (player1.ActivePet.CustomData.ContainsKey("CritRatioModifier")) player1.ActivePet.CustomData.Remove("CritRatioModifier");
 
             State = BattleState.None;

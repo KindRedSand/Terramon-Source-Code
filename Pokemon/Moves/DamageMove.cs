@@ -392,6 +392,87 @@ namespace Terramon.Pokemon.Moves
                 return text;
             }
 
+            if (stat == GetStat.Speed)
+            {
+                statname = "Speed";
+                if (pokemon.CustomData.ContainsKey("SpeedModifier"))
+                {
+                    if (int.Parse(pokemon.CustomData["SpeedModifier"]) == 6 && modifier > 0)
+                    {
+                        pokemon.CustomData["SpeedModifier"] = "6";
+                        adjustment = "won't go higher!";
+                        text.Args = new object[]
+                        {
+                            pokemon.PokemonName,
+                            statname,
+                            adjustment
+                        };
+                        return text; // Cant go any higher!
+                    }
+                    else if (int.Parse(pokemon.CustomData["SpeedModifier"]) == -6 && modifier < 0)
+                    {
+                        pokemon.CustomData["SpeedModifier"] = "-6";
+                        adjustment = "won't go lower!";
+                        text.Args = new object[]
+                        {
+                            pokemon.PokemonName,
+                            statname,
+                            adjustment
+                        };
+                        return text; // Cant go any lower!
+                    }
+                }
+
+                if (pokemon.CustomData.ContainsKey("SpeedModifier"))
+                {
+                    int a = int.Parse(pokemon.CustomData["SpeedModifier"]);
+                    int b = modifier;
+                    pokemon.CustomData["SpeedModifier"] = (a + b).ToString();
+                    if (modifier > 0)
+                    {
+                        Main.PlaySound(ModContent.GetInstance<TerramonMod>().GetLegacySoundSlot(SoundType.Custom, "Sounds/UI/BattleSFX/StatRise").WithVolume(.8f));
+                        target.statModifiedUp = true;
+                    }
+                    else
+                    {
+                        Main.PlaySound(ModContent.GetInstance<TerramonMod>().GetLegacySoundSlot(SoundType.Custom, "Sounds/UI/BattleSFX/StatFall").WithVolume(.8f));
+                        target.statModifiedDown = true;
+                    }
+                }
+                else
+                {
+                    pokemon.CustomData.Add("SpeedModifier", modifier.ToString());
+                    if (modifier > 0)
+                    {
+                        Main.PlaySound(ModContent.GetInstance<TerramonMod>().GetLegacySoundSlot(SoundType.Custom, "Sounds/UI/BattleSFX/StatRise").WithVolume(.8f));
+                        target.statModifiedUp = true;
+                    }
+                    else
+                    {
+                        Main.PlaySound(ModContent.GetInstance<TerramonMod>().GetLegacySoundSlot(SoundType.Custom, "Sounds/UI/BattleSFX/StatFall").WithVolume(.8f));
+                        target.statModifiedDown = true;
+                    }
+                }
+
+                if (int.Parse(pokemon.CustomData["SpeedModifier"]) > 6)
+                {
+                    pokemon.CustomData["SpeedModifier"] = "6";
+                }
+
+                if (int.Parse(pokemon.CustomData["SpeedModifier"]) < -6)
+                {
+                    pokemon.CustomData["SpeedModifier"] = "-6";
+                }
+
+                text.Args = new object[]
+                {
+                    pokemon.PokemonName,
+                    statname,
+                    adjustment
+                };
+                return text;
+            }
+
             // Pseudo-statistic
             if (stat == GetStat.CritRatio)
             {

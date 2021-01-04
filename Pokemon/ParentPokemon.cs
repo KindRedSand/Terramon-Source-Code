@@ -77,6 +77,8 @@ namespace Terramon.Pokemon
 
         public bool shiny = false;
 
+        public bool useAi = true;
+
         public int frame;
         public int frameCounter;
 
@@ -294,7 +296,7 @@ namespace Terramon.Pokemon
 
             if (!highlighted) justHighlighted = false;
 
-            if (!Wild && !flying && SpawnTime >= 0) PuppyAI();
+            if (!Wild && !flying && SpawnTime >= 0 && useAi) PuppyAI();
 
             Player player = Main.player[projectile.owner];
             TerramonPlayer modPlayer = player.GetModPlayer<TerramonPlayer>();
